@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-converter"
+version = "0.1.0"
+description = "Converte imagens PNG em SVG e STL"
+requires-python = ">=3.10"
+dependencies = [
+    "vtracer>=0.6",
+    "click>=8.1",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+]
+
+[project.scripts]
+image-converter = "image_converter.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+image_converter = ["static/*"]

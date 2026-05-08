@@ -1,0 +1,11 @@
+services:
+  image-converter:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - uploads:/tmp/image-converter
+    restart: unless-stopped
+
+volumes:
+  uploads:

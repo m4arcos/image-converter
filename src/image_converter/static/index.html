@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Image Converter</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #e0e7ff;
+      --success: #22c55e;
+      --error: #ef4444;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px 80px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header h1 span { color: var(--primary); }
+    header p { color: var(--muted); margin-top: 6px; font-size: 0.95rem; }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .upload-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .upload-zone p { color: var(--muted); font-size: 0.9rem; }
+    .upload-zone strong { color: var(--primary); }
+    .file-selected {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: var(--primary-light);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 14px;
+    }
+    .file-selected.visible { display: flex; }
+    .file-selected .file-icon { font-size: 1.4rem; }
+    .file-selected .file-info { flex: 1; text-align: left; }
+    .file-selected .file-name { font-weight: 600; font-size: 0.9rem; word-break: break-all; }
+    .file-selected .file-size { font-size: 0.78rem; color: var(--muted); }
+    .file-selected .remove-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--muted); font-size: 1.1rem; padding: 4px;
+      border-radius: 4px; transition: color 0.15s;
+    }
+    .file-selected .remove-btn:hover { color: var(--error); }
+
+    /* Section */
+    .section { margin-top: 24px; }
+    .section-label {
+      font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.6px; color: var(--muted); margin-bottom: 10px;
+    }
+
+    /* Mode toggle */
+    .mode-toggle { display: flex; gap: 8px; }
+    .mode-btn {
+      flex: 1; padding: 10px; border: 2px solid var(--border);
+      background: var(--card); border-radius: 8px; cursor: pointer;
+      font-size: 0.875rem; font-weight: 500; color: var(--muted);
+      transition: all 0.15s; text-align: center;
+    }
+    .mode-btn.active {
+      border-color: var(--primary); background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+    .mode-btn .mode-label { display: block; font-weight: 600; }
+    .mode-btn .mode-desc { font-size: 0.75rem; margin-top: 2px; }
+
+    /* Options grid */
+    .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .option-group label {
+      display: block; font-size: 0.82rem; font-weight: 600;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .option-group .input-row { display: flex; align-items: center; gap: 8px; }
+    .option-group input[type="range"] {
+      flex: 1; accent-color: var(--primary); cursor: pointer;
+    }
+    .option-group .value-badge {
+      background: var(--primary-light); color: var(--primary-dark);
+      border-radius: 6px; padding: 2px 8px; font-size: 0.8rem;
+      font-weight: 700; min-width: 42px; text-align: center;
+    }
+
+    /* Color mode */
+    .radio-group { display: flex; gap: 8px; }
+    .radio-option {
+      flex: 1; display: flex; align-items: center; gap: 6px;
+      border: 2px solid var(--border); border-radius: 8px;
+      padding: 8px 12px; cursor: pointer; transition: all 0.15s;
+      font-size: 0.875rem; font-weight: 500; color: var(--muted);
+    }
+    .radio-option input { accent-color: var(--primary); cursor: pointer; }
+    .radio-option:has(input:checked) {
+      border-color: var(--primary); background: var(--primary-light); color: var(--primary-dark);
+    }
+
+    /* Number input */
+    .option-group input[type="number"] {
+      flex: 1; padding: 6px 10px; border: 1px solid var(--border);
+      border-radius: 6px; font-size: 0.875rem; color: var(--text);
+      background: var(--card); outline: none; transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+    .option-group input[type="number"]::-webkit-outer-spin-button,
+    .option-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .option-group input[type="number"]:focus { border-color: var(--primary); }
+
+    /* STL options block */
+    #stl-options { transition: opacity 0.2s; }
+    #stl-options.hidden { opacity: 0.3; pointer-events: none; }
+
+    /* Convert button */
+    .convert-btn {
+      width: 100%; margin-top: 28px; padding: 14px;
+      background: var(--primary); color: white; border: none;
+      border-radius: var(--radius); font-size: 1rem; font-weight: 600;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .convert-btn:hover:not(:disabled) { background: var(--primary-dark); }
+    .convert-btn:active:not(:disabled) { transform: scale(0.98); }
+    .convert-btn:disabled { background: var(--muted); cursor: not-allowed; opacity: 0.6; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .spinner.visible { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error message */
+    .error-box {
+      display: none; margin-top: 16px; padding: 12px 16px;
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: 8px; color: var(--error); font-size: 0.875rem;
+    }
+    .error-box.visible { display: block; }
+
+    /* Results */
+    .results-card {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 28px;
+      width: 100%; max-width: 560px; margin-top: 24px;
+      display: none;
+    }
+    .results-card.visible { display: block; }
+    .results-card h2 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .results-card h2::before { content: "✓"; color: var(--success); }
+
+    .svg-preview {
+      border: 1px solid var(--border); border-radius: 8px;
+      overflow: hidden; background: #f8f8f8;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 200px; max-height: 300px; margin-bottom: 20px;
+    }
+    .svg-preview img {
+      max-width: 100%; max-height: 300px; object-fit: contain;
+      padding: 16px;
+    }
+
+    .download-list { display: flex; flex-direction: column; gap: 10px; }
+    .download-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border: 1px solid var(--border);
+      border-radius: 8px; text-decoration: none; color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .download-item:hover { border-color: var(--primary); background: var(--primary-light); }
+    .download-item .dl-icon { font-size: 1.5rem; }
+    .download-item .dl-info { flex: 1; }
+    .download-item .dl-name { font-weight: 600; font-size: 0.9rem; }
+    .download-item .dl-desc { font-size: 0.78rem; color: var(--muted); margin-top: 1px; }
+    .download-item .dl-arrow { color: var(--muted); font-size: 1.1rem; }
+
+    .convert-another {
+      margin-top: 16px; width: 100%; padding: 10px;
+      background: none; border: 2px solid var(--border);
+      border-radius: 8px; cursor: pointer; font-size: 0.875rem;
+      font-weight: 600; color: var(--muted); transition: all 0.15s;
+    }
+    .convert-another:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* STL 3D preview */
+    .stl-preview-section { margin-top: 24px; }
+    .stl-canvas-wrap {
+      position: relative; border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden; background: #0f172a;
+      height: 280px;
+    }
+    .stl-canvas-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+    .stl-hint {
+      position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.45); color: rgba(255,255,255,0.75);
+      font-size: 0.72rem; padding: 4px 10px; border-radius: 20px;
+      pointer-events: none; white-space: nowrap;
+    }
+    .stl-loading {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 12px; color: #94a3b8;
+      font-size: 0.875rem;
+    }
+    .stl-loading .stl-spinner {
+      width: 28px; height: 28px; border: 3px solid rgba(99,102,241,0.25);
+      border-top-color: var(--primary); border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Image <span>Converter</span></h1>
+    <p>Converta PNG em SVG e STL para impressão 3D</p>
+  </header>
+
+  <div class="card">
+    <!-- Upload -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept=".png" />
+      <div class="upload-icon">🖼️</div>
+      <p><strong>Clique para selecionar</strong> ou arraste um arquivo PNG</p>
+      <p style="margin-top:4px; font-size:0.78rem;">Máximo 20 MB</p>
+    </div>
+    <div class="file-selected" id="fileSelected">
+      <span class="file-icon">📄</span>
+      <div class="file-info">
+        <div class="file-name" id="fileName"></div>
+        <div class="file-size" id="fileSize"></div>
+      </div>
+      <button class="remove-btn" id="removeBtn" title="Remover">✕</button>
+    </div>
+
+    <!-- Conversion mode -->
+    <div class="section">
+      <div class="section-label">Converter para</div>
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="svg">
+          <span class="mode-label">SVG</span>
+          <span class="mode-desc">PNG → SVG</span>
+        </button>
+        <button class="mode-btn" data-mode="both">
+          <span class="mode-label">SVG + STL</span>
+          <span class="mode-desc">PNG → SVG → STL</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STL options -->
+    <div class="section" id="stl-options">
+      <div class="section-label">Opções STL</div>
+      <div class="options-grid">
+        <div class="option-group">
+          <label>Altura (mm)</label>
+          <div class="input-row">
+            <input type="range" id="heightRange" min="1" max="20" step="0.5" value="3" />
+            <span class="value-badge" id="heightVal">3.0</span>
+          </div>
+        </div>
+        <div class="option-group">
+          <label for="sizeInput">Tamanho máx. (mm)</label>
+          <div class="input-row">
+            <input type="number" id="sizeInput" min="1" max="1000" step="1" placeholder="ex: 50" />
+            <span class="value-badge" style="background:none;color:var(--muted);font-weight:500">mm</span>
+          </div>
+          <div style="font-size:0.72rem;color:var(--muted);margin-top:4px">Maior dimensão do objeto (X ou Y)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vectorization options -->
+    <div class="section">
+      <div class="section-label">Opções de vetorização</div>
+      <div class="options-grid">
+        <div class="option-group">
+          <label>Modo de cor</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="colormode" value="binary" checked /> P&amp;B
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="colormode" value="color" /> Colorido
+            </label>
+          </div>
+        </div>
+        <div class="option-group">
+          <label>Filtro de ruído</label>
+          <div class="input-row">
+            <input type="range" id="speckleRange" min="1" max="16" step="1" value="4" />
+            <span class="value-badge" id="speckleVal">4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <button class="convert-btn" id="convertBtn" disabled>
+      <span class="spinner" id="spinner"></span>
+      <span id="convertLabel">Selecione um arquivo para converter</span>
+    </button>
+  </div>
+
+  <!-- Results -->
+  <div class="results-card" id="resultsCard">
+    <h2>Conversão concluída</h2>
+    <div class="svg-preview" id="svgPreview"></div>
+    <div class="stl-preview-section" id="stlPreviewSection" style="display:none">
+      <div class="section-label" style="margin-bottom:10px">Preview 3D</div>
+      <div class="stl-canvas-wrap" id="stlCanvasWrap">
+        <div class="stl-loading" id="stlLoading">
+          <div class="stl-spinner"></div>
+          <span>Carregando modelo 3D…</span>
+        </div>
+      </div>
+    </div>
+    <div class="download-list" id="downloadList" style="margin-top:20px"></div>
+    <button class="convert-another" id="convertAnother">+ Converter outro arquivo</button>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+    import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    const fileInput = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+    const fileSelected = document.getElementById('fileSelected');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeBtn = document.getElementById('removeBtn');
+    const convertBtn = document.getElementById('convertBtn');
+    const convertLabel = document.getElementById('convertLabel');
+    const spinner = document.getElementById('spinner');
+    const errorBox = document.getElementById('errorBox');
+    const resultsCard = document.getElementById('resultsCard');
+    const svgPreview = document.getElementById('svgPreview');
+    const downloadList = document.getElementById('downloadList');
+    const convertAnother = document.getElementById('convertAnother');
+    const stlOptions = document.getElementById('stl-options');
+    const stlPreviewSection = document.getElementById('stlPreviewSection');
+    const stlCanvasWrap = document.getElementById('stlCanvasWrap');
+    const stlLoading = document.getElementById('stlLoading');
+
+    let selectedFile = null;
+    let currentMode = 'svg';
+    let stlAnimId = null;
+    let stlRenderer = null;
+
+    // --- Drag & drop ---
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+    uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+    uploadZone.addEventListener('drop', e => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      const f = e.dataTransfer.files[0];
+      if (f) setFile(f);
+    });
+    fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
+    removeBtn.addEventListener('click', clearFile);
+
+    function setFile(f) {
+      if (!f.name.toLowerCase().endsWith('.png')) { showError('Apenas arquivos PNG são aceitos.'); return; }
+      selectedFile = f;
+      fileName.textContent = f.name;
+      fileSize.textContent = formatBytes(f.size);
+      fileSelected.classList.add('visible');
+      convertBtn.disabled = false;
+      convertLabel.textContent = 'Converter';
+      hideError();
+      resultsCard.classList.remove('visible');
+    }
+
+    function clearFile() {
+      selectedFile = null;
+      fileInput.value = '';
+      fileSelected.classList.remove('visible');
+      convertBtn.disabled = true;
+      convertLabel.textContent = 'Selecione um arquivo para converter';
+      resultsCard.classList.remove('visible');
+      disposeSTL();
+    }
+
+    function formatBytes(b) {
+      if (b < 1024) return b + ' B';
+      if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
+      return (b / 1024 / 1024).toFixed(1) + ' MB';
+    }
+
+    // --- Mode toggle ---
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentMode = btn.dataset.mode;
+        stlOptions.classList.toggle('hidden', currentMode === 'svg');
+      });
+    });
+    stlOptions.classList.add('hidden');
+
+    // --- Range inputs ---
+    function bindRange(rangeId, valId, decimals = 1) {
+      const range = document.getElementById(rangeId);
+      const val = document.getElementById(valId);
+      range.addEventListener('input', () => { val.textContent = parseFloat(range.value).toFixed(decimals); });
+    }
+    bindRange('heightRange', 'heightVal', 1);
+    bindRange('speckleRange', 'speckleVal', 0);
+
+    // --- Errors ---
+    function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('visible'); }
+    function hideError() { errorBox.classList.remove('visible'); }
+
+    // --- Convert ---
+    convertBtn.addEventListener('click', async () => {
+      if (!selectedFile) return;
+      convertBtn.disabled = true;
+      spinner.classList.add('visible');
+      convertLabel.textContent = 'Convertendo…';
+      hideError();
+      resultsCard.classList.remove('visible');
+
+      const form = new FormData();
+      form.append('file', selectedFile);
+      form.append('mode', currentMode);
+      form.append('height', document.getElementById('heightRange').value);
+      const sizeVal = document.getElementById('sizeInput').value;
+      if (sizeVal) form.append('size_mm', sizeVal);
+      form.append('colormode', document.querySelector('input[name="colormode"]:checked').value);
+      form.append('speckle', document.getElementById('speckleRange').value);
+
+      try {
+        const res = await fetch('/convert', { method: 'POST', body: form });
+        const data = await res.json();
+        if (!res.ok) { showError(data.detail || 'Erro desconhecido na conversão.'); return; }
+        showResults(data.files);
+      } catch {
+        showError('Erro de comunicação com o servidor.');
+      } finally {
+        convertBtn.disabled = false;
+        spinner.classList.remove('visible');
+        convertLabel.textContent = 'Converter';
+      }
+    });
+
+    // --- Results ---
+    function showResults(files) {
+      svgPreview.innerHTML = '';
+      downloadList.innerHTML = '';
+      disposeSTL();
+
+      const svgFile = files.find(f => f.type === 'svg');
+      if (svgFile) {
+        const img = document.createElement('img');
+        img.src = svgFile.url;
+        img.alt = 'SVG Preview';
+        svgPreview.appendChild(img);
+      }
+
+      const stlFile = files.find(f => f.type === 'stl');
+      if (stlFile) {
+        stlPreviewSection.style.display = 'block';
+        initSTLPreview(stlFile.url);
+      } else {
+        stlPreviewSection.style.display = 'none';
+      }
+
+      const icons = { svg: '📐', stl: '🧊' };
+      const descs = { svg: 'Vetor escalável — para edição ou impressão', stl: 'Malha 3D — para impressão 3D' };
+
+      files.forEach(f => {
+        const a = document.createElement('a');
+        a.href = f.url;
+        a.download = f.name;
+        a.className = 'download-item';
+        a.innerHTML = `
+          <span class="dl-icon">${icons[f.type]}</span>
+          <div class="dl-info">
+            <div class="dl-name">${f.name}</div>
+            <div class="dl-desc">${descs[f.type]}</div>
+          </div>
+          <span class="dl-arrow">⬇</span>`;
+        downloadList.appendChild(a);
+      });
+
+      resultsCard.classList.add('visible');
+      resultsCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    convertAnother.addEventListener('click', () => {
+      clearFile();
+      resultsCard.classList.remove('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // --- STL 3D preview ---
+    function disposeSTL() {
+      if (stlAnimId) { cancelAnimationFrame(stlAnimId); stlAnimId = null; }
+      if (stlRenderer) { stlRenderer.dispose(); stlRenderer = null; }
+    }
+
+    function initSTLPreview(url) {
+      const wrap = stlCanvasWrap;
+      stlLoading.style.display = 'flex';
+
+      const w = wrap.clientWidth || 520;
+      const h = 280;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f172a);
+
+      const camera = new THREE.PerspectiveCamera(45, w / h, 0.01, 1000);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h);
+      stlRenderer = renderer;
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 1.2;
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+      const key = new THREE.DirectionalLight(0xffffff, 1.0);
+      key.position.set(5, 8, 5);
+      scene.add(key);
+      const fill = new THREE.DirectionalLight(0x8899ff, 0.4);
+      fill.position.set(-5, 2, -3);
+      scene.add(fill);
+
+      const loader = new STLLoader();
+      loader.load(url, geometry => {
+        geometry.computeBoundingBox();
+        const box = geometry.boundingBox;
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        geometry.translate(-center.x, -center.y, -center.z);
+
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const norm = 4 / maxDim;
+
+        const material = new THREE.MeshPhongMaterial({
+          color: 0x6366f1,
+          specular: 0x334466,
+          shininess: 40,
+          side: THREE.DoubleSide,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.scale.setScalar(norm);
+        scene.add(mesh);
+
+        camera.position.set(4, 3, 5);
+        camera.lookAt(0, 0, 0);
+
+        stlLoading.style.display = 'none';
+        wrap.innerHTML = '';
+        wrap.appendChild(renderer.domElement);
+
+        const hint = document.createElement('div');
+        hint.className = 'stl-hint';
+        hint.textContent = '🖱 Arraste para rotacionar · Scroll para zoom';
+        wrap.appendChild(hint);
+
+        function animate() {
+          stlAnimId = requestAnimationFrame(animate);
+          controls.update();
+          renderer.render(scene, camera);
+        }
+        animate();
+      }, undefined, () => {
+        stlLoading.innerHTML = '<span style="color:#f87171">Falha ao carregar o preview 3D.</span>';
+      });
+    }
+  </script>
+</body>
+</html>

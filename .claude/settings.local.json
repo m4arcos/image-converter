@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p /home/m4arcos/workspace/image-converter/src/image_converter /home/m4arcos/workspace/image-converter/tests /home/m4arcos/workspace/image-converter/output)"
+    ],
+    "additionalDirectories": [
+      "/home/m4arcos/workspace/image-converter/src"
+    ]
+  }
+}
