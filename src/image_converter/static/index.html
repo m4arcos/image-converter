@@ -263,15 +263,15 @@
 
   <header>
     <h1>Image <span>Converter</span></h1>
-    <p>Converta PNG em SVG e STL para impressão 3D</p>
+    <p>Converta PNG, JPEG ou WEBP em SVG e STL para impressão 3D</p>
   </header>
 
   <div class="card">
     <!-- Upload -->
     <div class="upload-zone" id="uploadZone">
-      <input type="file" id="fileInput" accept=".png" />
+      <input type="file" id="fileInput" accept=".png,.jpg,.jpeg,.webp" />
       <div class="upload-icon">🖼️</div>
-      <p><strong>Clique para selecionar</strong> ou arraste um arquivo PNG</p>
+      <p><strong>Clique para selecionar</strong> ou arraste um arquivo PNG, JPG, JPEG ou WEBP</p>
       <p style="margin-top:4px; font-size:0.78rem;">Máximo 20 MB</p>
     </div>
     <div class="file-selected" id="fileSelected">
@@ -419,8 +419,16 @@
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
     removeBtn.addEventListener('click', clearFile);
 
+    const ALLOWED_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp'];
+
     function setFile(f) {
-      if (!f.name.toLowerCase().endsWith('.png')) { showError('Apenas arquivos PNG são aceitos.'); return; }
+      const name = f.name.toLowerCase();
+      if (!ALLOWED_EXTENSIONS.some(ext => name.endsWith(ext))) {
+        const match = name.match(/\.[^.]+$/);
+        const sentExt = match ? match[0] : '(sem extensão)';
+        showError(`Apenas arquivos PNG, JPG, JPEG ou WEBP são aceitos. Você enviou: ${sentExt}`);
+        return;
+      }
       selectedFile = f;
       fileName.textContent = f.name;
       fileSize.textContent = formatBytes(f.size);

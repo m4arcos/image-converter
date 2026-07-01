@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import vtracer
+from PIL import Image, UnidentifiedImageError
 
 
 def png_to_svg(
@@ -23,19 +24,23 @@ def png_to_svg(
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    vtracer.convert_image_to_svg_py(
-        str(input_path),
-        str(output_path),
-        colormode=colormode,
-        filter_speckle=filter_speckle,
-        color_precision=6,
-        layer_difference=16,
-        corner_threshold=corner_threshold,
-        length_threshold=length_threshold,
-        max_iterations=10,
-        splice_threshold=45,
-        path_precision=path_precision,
-    )
+    normalized_path = _normalize_to_png(input_path)
+    try:
+        vtracer.convert_image_to_svg_py(
+            str(normalized_path),
+            str(output_path),
+            colormode=colormode,
+            filter_speckle=filter_speckle,
+            color_precision=6,
+            layer_difference=16,
+            corner_threshold=corner_threshold,
+            length_threshold=length_threshold,
+            max_iterations=10,
+            splice_threshold=45,
+            path_precision=path_precision,
+        )
+    finally:
+        normalized_path.unlink(missing_ok=True)
 
     return output_path
 
@@ -107,6 +112,31 @@ def png_to_stl(
     svg_to_stl(svg_path, output_path, height_mm=height_mm, scale=scale, size_mm=size_mm)
 
     return svg_path, output_path
+
+
+def _normalize_to_png(input_path: Path) -> Path:
+    """Reencoda a imagem de entrada como PNG usando Pillow.
+
+    O decodificador de imagem do vtracer não suporta todas as variantes de WEBP
+    (ex: com canal alpha ou modo lossless) e falha com um panic em Rust nesses
+    casos, em vez de uma exceção Python normal. Reencodar sempre via Pillow
+    evita esse problema para qualquer formato de entrada suportado por ele.
+    """
+    try:
+        with Image.open(input_path) as img:
+            img.load()
+            has_alpha = "A" in img.mode or "transparency" in img.info
+            target_mode = "RGBA" if has_alpha else "RGB"
+            if img.mode != target_mode:
+                img = img.convert(target_mode)
+
+            fd, tmp_name = tempfile.mkstemp(suffix=".png")
+            os.close(fd)
+            img.save(tmp_name, "PNG")
+    except UnidentifiedImageError as e:
+        raise ValueError(f"Arquivo de imagem inválido ou corrompido: {input_path.name}") from e
+
+    return Path(tmp_name)
 
 
 def _check_openscad() -> None:

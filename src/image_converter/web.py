@@ -12,6 +12,7 @@ from .converter import png_to_svg, svg_to_stl
 UPLOAD_DIR = Path("/tmp/image-converter")
 STATIC_DIR = Path(__file__).parent / "static"
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20 MB
+ALLOWED_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
 
 executor = ThreadPoolExecutor(max_workers=4)
 
@@ -38,8 +39,12 @@ async def convert(
     colormode: str = Form("binary"),
     speckle: int = Form(4),
 ):
-    if not file.filename.lower().endswith(".png"):
-        raise HTTPException(400, "Apenas arquivos PNG são aceitos.")
+    if not file.filename.lower().endswith(ALLOWED_EXTENSIONS):
+        sent_ext = Path(file.filename).suffix or "(sem extensão)"
+        raise HTTPException(
+            400,
+            f"Apenas arquivos PNG, JPG, JPEG ou WEBP são aceitos. Você enviou: {sent_ext}",
+        )
 
     content = await file.read()
     if len(content) > MAX_FILE_SIZE:
@@ -80,9 +85,15 @@ async def convert(
             )
             files.append({"type": "stl", "name": stl_path.name, "url": f"/files/{job_id}/{stl_path.name}"})
 
+    except ValueError as e:
+        raise HTTPException(400, str(e))
     except EnvironmentError as e:
         raise HTTPException(503, str(e))
-    except Exception as e:
+    except HTTPException:
+        raise
+    except BaseException as e:
+        # Captura também panics de código Rust (ex: pyo3_runtime.PanicException),
+        # que herdam de BaseException e não seriam pegos por "except Exception".
         raise HTTPException(500, f"Falha na conversão: {e}")
 
     return {"job_id": job_id, "files": files}

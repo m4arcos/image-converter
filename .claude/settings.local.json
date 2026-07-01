@@ -1,7 +1,35 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir -p /home/m4arcos/workspace/image-converter/src/image_converter /home/m4arcos/workspace/image-converter/tests /home/m4arcos/workspace/image-converter/output)"
+      "Bash(mkdir -p /home/m4arcos/workspace/image-converter/src/image_converter /home/m4arcos/workspace/image-converter/tests /home/m4arcos/workspace/image-converter/output)",
+      "Bash(python -c ' *)",
+      "Bash(python3 -c \"import vtracer\")",
+      "Bash(pip3 --version)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m pip --version)",
+      "Bash(docker run --rm python:3.12-slim bash -c ' *)",
+      "Bash(docker build *)",
+      "Bash(docker run *)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/response.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8123/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test.webp;filename=test.webp;type=image/webp' -F mode=svg)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/resp_rgba.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8123/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test_rgba.webp;filename=test_rgba.webp;type=image/webp' -F mode=both)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/resp_lossless.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8123/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test_lossless.webp;filename=test_lossless.webp;type=image/webp' -F mode=both)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/r1.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8123/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test_rgba.webp;filename=test_rgba.webp;type=image/webp' -F mode=svg)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/r2.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8123/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test.webp;filename=test.webp;type=image/webp' -F mode=both)",
+      "Bash(docker stop *)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/f1.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test_rgba.webp;filename=test_rgba.webp;type=image/webp' -F mode=both)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/f2.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test_lossless.webp;filename=test_lossless.webp;type=image/webp' -F mode=both)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/f3.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/test.webp;filename=test.webp;type=image/webp' -F mode=both)",
+      "Bash(docker exec *)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/g1.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_plain.webp;filename=circle_plain.webp;type=image/webp' -F mode=both)",
+      "Bash(curl -s -o /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/g2.json -w 'HTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_alpha.webp;filename=circle_alpha.webp;type=image/webp' -F mode=both)",
+      "Bash(awk '/^---$/{f=1;next}{if\\(!f\\)print > \"/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/png_b64.txt\"; else print > \"/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/jpg_b64.txt\"}' /tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/pngjpg_b64.txt)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.png;filename=circle.png' -F mode=both)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8124/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.jpg;filename=circle.jpg' -F mode=both)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/empty.png;filename=empty.png' -F mode=svg)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_alpha.webp;filename=circle_alpha.webp' -F mode=both)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_plain.webp;filename=circle_plain.webp' -F mode=both)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.png;filename=circle.png' -F mode=both)",
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.jpg;filename=circle.jpg' -F mode=both)"
     ],
     "additionalDirectories": [
       "/home/m4arcos/workspace/image-converter/src"
