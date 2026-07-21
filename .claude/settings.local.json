@@ -29,7 +29,13 @@
       "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_alpha.webp;filename=circle_alpha.webp' -F mode=both)",
       "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle_plain.webp;filename=circle_plain.webp' -F mode=both)",
       "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.png;filename=circle.png' -F mode=both)",
-      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.jpg;filename=circle.jpg' -F mode=both)"
+      "Bash(curl -s -w '\\\\nHTTP %{http_code}\\\\n' -X POST http://localhost:8125/convert -F 'file=@/tmp/claude-1000/-home-m4arcos-workspace-image-converter/cfbc23bf-c4f2-4cb4-87bf-4143e983fdc3/scratchpad/circle.jpg;filename=circle.jpg' -F mode=both)",
+      "Bash(python -m pytest tests/ -q)",
+      "Bash(python3 -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "Bash(python3 -m py_compile src/image_converter/converter.py src/image_converter/cli.py src/image_converter/web.py src/image_converter/__init__.py)",
+      "Bash(python3 -m venv /tmp/claude-1000/-home-m4arcos-workspace-image-converter/f835288a-52d8-444d-a1be-098f7cdf33e1/scratchpad/venv)",
+      "Bash(docker --version)",
+      "Bash(docker compose *)"
     ],
     "additionalDirectories": [
       "/home/m4arcos/workspace/image-converter/src"

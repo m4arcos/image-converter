@@ -9,6 +9,41 @@ import vtracer
 from PIL import Image, UnidentifiedImageError
 
 
+def convert_image(
+    input_path: Path,
+    output_path: Path,
+    quality: int = 95,
+) -> Path:
+    """Converte uma imagem raster (ex: WEBP) para PNG ou JPG usando Pillow.
+
+    O formato de saída é definido pela extensão de output_path.
+    """
+    if not input_path.exists():
+        raise FileNotFoundError(f"Arquivo não encontrado: {input_path}")
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    target_format = output_path.suffix.lstrip(".").upper()
+    if target_format == "JPG":
+        target_format = "JPEG"
+    if target_format not in ("PNG", "JPEG"):
+        raise ValueError(f"Formato de saída não suportado: {output_path.suffix}")
+
+    save_kwargs = {}
+    try:
+        with Image.open(input_path) as img:
+            img.load()
+            if target_format == "JPEG":
+                if img.mode in ("RGBA", "P", "LA"):
+                    img = img.convert("RGB")
+                save_kwargs["quality"] = quality
+            img.save(output_path, target_format, **save_kwargs)
+    except UnidentifiedImageError as e:
+        raise ValueError(f"Arquivo de imagem inválido ou corrompido: {input_path.name}") from e
+
+    return output_path
+
+
 def png_to_svg(
     input_path: Path,
     output_path: Path,

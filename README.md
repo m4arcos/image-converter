@@ -90,6 +90,13 @@ image-converter to-stl logo.svg
 image-converter to-stl logo.svg saida/logo.stl --height 5
 ```
 
+### WEBP → PNG ou JPG
+
+```bash
+image-converter to-png logo.webp
+image-converter to-jpg logo.webp saida/logo.jpg --quality 90
+```
+
 ## Opções disponíveis
 
 | Opção | Padrão | Descrição |
@@ -103,7 +110,7 @@ image-converter to-stl logo.svg saida/logo.stl --height 5
 ## Como biblioteca Python
 
 ```python
-from image_converter import png_to_svg, svg_to_stl, png_to_stl
+from image_converter import png_to_svg, svg_to_stl, png_to_stl, convert_image
 from pathlib import Path
 
 # Pipeline completo
@@ -112,6 +119,10 @@ svg, stl = png_to_stl(Path("logo.png"), Path("logo.stl"), height_mm=5.0)
 # Passo a passo
 png_to_svg(Path("logo.png"), Path("logo.svg"))
 svg_to_stl(Path("logo.svg"), Path("logo.stl"), height_mm=3.0)
+
+# WEBP → PNG ou JPG
+convert_image(Path("logo.webp"), Path("logo.png"))
+convert_image(Path("logo.webp"), Path("logo.jpg"), quality=90)
 ```
 
 ## Testes

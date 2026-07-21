@@ -4,7 +4,7 @@ import click
 from rich.console import Console
 from rich.panel import Panel
 
-from .converter import png_to_stl, png_to_svg, svg_to_stl
+from .converter import convert_image, png_to_stl, png_to_svg, svg_to_stl
 
 console = Console()
 
@@ -34,6 +34,51 @@ def to_svg(input: Path, output: Path | None, colormode: str, speckle: int, corne
         try:
             result = png_to_svg(input, output, colormode=colormode, filter_speckle=speckle, corner_threshold=corner)
             console.print(Panel(f"[green]SVG salvo em:[/green] {result}", title="Concluído", border_style="green"))
+        except Exception as e:
+            console.print(Panel(f"[red]{e}[/red]", title="Erro", border_style="red"))
+            raise SystemExit(1)
+
+
+@main.command("to-png")
+@click.argument("input", type=click.Path(exists=True, path_type=Path))
+@click.argument("output", type=click.Path(path_type=Path), required=False)
+def to_png(input: Path, output: Path | None):
+    """Converte WEBP/JPG em PNG.
+
+    \b
+    Exemplos:
+      image-converter to-png logo.webp
+      image-converter to-png logo.webp output/logo.png
+    """
+    output = output or input.with_suffix(".png")
+
+    with console.status(f"Convertendo [bold]{input.name}[/bold] para PNG..."):
+        try:
+            result = convert_image(input, output)
+            console.print(Panel(f"[green]PNG salvo em:[/green] {result}", title="Concluído", border_style="green"))
+        except Exception as e:
+            console.print(Panel(f"[red]{e}[/red]", title="Erro", border_style="red"))
+            raise SystemExit(1)
+
+
+@main.command("to-jpg")
+@click.argument("input", type=click.Path(exists=True, path_type=Path))
+@click.argument("output", type=click.Path(path_type=Path), required=False)
+@click.option("--quality", default=95, show_default=True, help="Qualidade JPEG (1-100).")
+def to_jpg(input: Path, output: Path | None, quality: int):
+    """Converte WEBP/PNG em JPG.
+
+    \b
+    Exemplos:
+      image-converter to-jpg logo.webp
+      image-converter to-jpg logo.webp output/logo.jpg --quality 90
+    """
+    output = output or input.with_suffix(".jpg")
+
+    with console.status(f"Convertendo [bold]{input.name}[/bold] para JPG..."):
+        try:
+            result = convert_image(input, output, quality=quality)
+            console.print(Panel(f"[green]JPG salvo em:[/green] {result}", title="Concluído", border_style="green"))
         except Exception as e:
             console.print(Panel(f"[red]{e}[/red]", title="Erro", border_style="red"))
             raise SystemExit(1)

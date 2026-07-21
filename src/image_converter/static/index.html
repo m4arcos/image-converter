@@ -155,7 +155,7 @@
 
     /* STL options block */
     #stl-options { transition: opacity 0.2s; }
-    #stl-options.hidden { opacity: 0.3; pointer-events: none; }
+    .section.hidden { opacity: 0.3; pointer-events: none; }
 
     /* Convert button */
     .convert-btn {
@@ -296,6 +296,16 @@
           <span class="mode-desc">PNG → SVG → STL</span>
         </button>
       </div>
+      <div class="mode-toggle" style="margin-top:8px">
+        <button class="mode-btn" data-mode="png">
+          <span class="mode-label">PNG</span>
+          <span class="mode-desc">WEBP → PNG</span>
+        </button>
+        <button class="mode-btn" data-mode="jpg">
+          <span class="mode-label">JPG</span>
+          <span class="mode-desc">WEBP → JPG</span>
+        </button>
+      </div>
     </div>
 
     <!-- STL options -->
@@ -321,7 +331,7 @@
     </div>
 
     <!-- Vectorization options -->
-    <div class="section">
+    <div class="section" id="vector-options">
       <div class="section-label">Opções de vetorização</div>
       <div class="options-grid">
         <div class="option-group">
@@ -398,6 +408,7 @@
     const downloadList = document.getElementById('downloadList');
     const convertAnother = document.getElementById('convertAnother');
     const stlOptions = document.getElementById('stl-options');
+    const vectorOptions = document.getElementById('vector-options');
     const stlPreviewSection = document.getElementById('stlPreviewSection');
     const stlCanvasWrap = document.getElementById('stlCanvasWrap');
     const stlLoading = document.getElementById('stlLoading');
@@ -461,7 +472,9 @@
         document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentMode = btn.dataset.mode;
-        stlOptions.classList.toggle('hidden', currentMode === 'svg');
+        const isRasterMode = currentMode === 'png' || currentMode === 'jpg';
+        stlOptions.classList.toggle('hidden', currentMode !== 'both');
+        vectorOptions.classList.toggle('hidden', isRasterMode);
       });
     });
     stlOptions.classList.add('hidden');
@@ -517,11 +530,11 @@
       downloadList.innerHTML = '';
       disposeSTL();
 
-      const svgFile = files.find(f => f.type === 'svg');
-      if (svgFile) {
+      const previewFile = files.find(f => f.type === 'svg' || f.type === 'png' || f.type === 'jpg');
+      if (previewFile) {
         const img = document.createElement('img');
-        img.src = svgFile.url;
-        img.alt = 'SVG Preview';
+        img.src = previewFile.url;
+        img.alt = 'Preview';
         svgPreview.appendChild(img);
       }
 
@@ -533,8 +546,13 @@
         stlPreviewSection.style.display = 'none';
       }
 
-      const icons = { svg: '📐', stl: '🧊' };
-      const descs = { svg: 'Vetor escalável — para edição ou impressão', stl: 'Malha 3D — para impressão 3D' };
+      const icons = { svg: '📐', stl: '🧊', png: '🖼️', jpg: '🖼️' };
+      const descs = {
+        svg: 'Vetor escalável — para edição ou impressão',
+        stl: 'Malha 3D — para impressão 3D',
+        png: 'Imagem PNG com transparência',
+        jpg: 'Imagem JPG comprimida',
+      };
 
       files.forEach(f => {
         const a = document.createElement('a');
