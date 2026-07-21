@@ -35,7 +35,12 @@
       "Bash(python3 -m py_compile src/image_converter/converter.py src/image_converter/cli.py src/image_converter/web.py src/image_converter/__init__.py)",
       "Bash(python3 -m venv /tmp/claude-1000/-home-m4arcos-workspace-image-converter/f835288a-52d8-444d-a1be-098f7cdf33e1/scratchpad/venv)",
       "Bash(docker --version)",
-      "Bash(docker compose *)"
+      "Bash(docker compose *)",
+      "Bash(docker cp *)",
+      "Bash(docker exec ic-test-server python -c ' *)",
+      "Bash(docker exec ic-test-server sh -c ' *)",
+      "Bash(docker rm *)",
+      "Bash(docker rmi *)"
     ],
     "additionalDirectories": [
       "/home/m4arcos/workspace/image-converter/src"
