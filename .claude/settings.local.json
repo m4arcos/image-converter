@@ -40,7 +40,11 @@
       "Bash(docker exec ic-test-server python -c ' *)",
       "Bash(docker exec ic-test-server sh -c ' *)",
       "Bash(docker rm *)",
-      "Bash(docker rmi *)"
+      "Bash(docker rmi *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m http.server 8123 --directory src/image_converter/static)",
+      "Bash(node -e \"console.log\\(require.resolve\\('puppeteer'\\)\\)\")",
+      "Bash(pkill -f \"http.server 8123\")"
     ],
     "additionalDirectories": [
       "/home/m4arcos/workspace/image-converter/src"
